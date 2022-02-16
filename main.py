@@ -13,7 +13,7 @@ pygame.font.init()
 
 iterations = 0
 
-map2 = [[0,7,0,0,2,0,0,4,6],
+map3 = [[0,7,0,0,2,0,0,4,6],
        [0,6,0,0,0,0,8,9,0],
        [2,0,0,8,0,0,7,1,5],
        [0,8,4,0,9,7,0,0,0],
@@ -51,13 +51,9 @@ def get_valid_numbers(row, col):
     invalid_number = []
     for i in range(9): #Gets all values from row
         num = map[i][col]
-        if (num >= 100):
-            num -= 100
         invalid_number.append(num)
     for i in range(9):
         num = map[row][i]
-        if (num >= 100):
-            num -= 100
         invalid_number.append(num)
 
     row_quad = math.floor(row / 3)*3 #Gets which quadrant we are in 
@@ -68,8 +64,6 @@ def get_valid_numbers(row, col):
     for i in range(0,3):
         for k in range(0,3):
             num = map[row_quad+i][col_quad+k]
-            if (num >= 100):
-                num -= 100
             invalid_number.append(num)
 
     valid_number = [] 
@@ -94,11 +88,12 @@ def solve(val):
     else:
         valid = get_valid_numbers(row, col)
         for i in range (len(valid)):
-            map[row][col] = valid[i] + 100
+            map[row][col] = valid[i]
             iterations += 1
-            main()
+            draw_square(row,col)
             solve(val+1)
             map[row][col] = 0 #Resets the value
+            remove_square(row, col)
     if (val == 0):
         print("No solution!")
 
@@ -118,8 +113,23 @@ def check_quit():
         if event.type == pygame.QUIT:
             quit()    
 
-def main():
-    check_quit()
+def draw_square(row,col):
+    num = map[row][col]
+    num_str = str(num)
+    if(num_str == "0"):
+        num_str = " "
+    font = PHASE_FONT.render(num_str, 1, BLUE)
+    WIN.blit(font, (col*100+40, row*100 + 30))
+    pygame.display.update()
+
+def remove_square(row,col):
+    block = pygame.Rect(col*100+10, row*100+10,80,80)
+    pygame.draw.rect(WIN, WHITE, block)
+    pygame.display.update()
+
+
+
+def draw_initial_map():
     WIN.fill(WHITE)
     for i in range(1, 9): #Draws all the vertical and horizontal lines
         line_thickness = 2
@@ -133,20 +143,19 @@ def main():
 
     for row in range(9):
         for col in range(9):
-            color = BLACK
             num = map[col][row]
-            if num >= 100:
-                num -= 100
-                color = BLUE
-
             num_str = str(num)
-
             if num_str == "0": #Removes our zeros
                 num_str = ""
-            font = PHASE_FONT.render(num_str, 1, color)
-            WIN.blit(font, (row*100+40, col*100 + 30))
-        
+            font = PHASE_FONT.render(num_str, 1, BLACK)
+            WIN.blit(font, (row*100+40, col*100 + 30))    
     pygame.display.update()
 
 
+
+
+
+
+
+draw_initial_map()
 solve(0)
